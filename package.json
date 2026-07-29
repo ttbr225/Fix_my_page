@@ -4,7 +4,8 @@
   "description": "site audit tool",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node --watch server.js",
+    "audit": "curl -s \"http://localhost:3000/audit?url=$npm_config_url\" > audit.json"
   },
   "keywords": [],
   "author": "",
@@ -12,5 +13,8 @@
   "devDependencies": {
     "eslint": "^10.8.0",
     "globals": "^17.8.0"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0"
   }
 }

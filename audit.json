@@ -1,0 +1,11 @@
+{
+  "url": "https://example.com/",
+  "targetStatus": 200,
+  "contentType": "text/html",
+  "title": {
+    "present": true,
+    "value": "Example Domain",
+    "length": 14
+  },
+  "bytes": 559
+}

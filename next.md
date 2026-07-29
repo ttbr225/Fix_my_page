@@ -1,4 +1,7 @@
-- [ ] ensure eslint is working
-- [ ] figure out what to .gitignore and what to stage
+- [x] ensure eslint is working
+- [x] figure out what to .gitignore and what to stage
+- [ ] README
+- [ ] heading checks
+- [ ] other checks
 - [ ] mvp·
 - [ ] `// @ts-check`
