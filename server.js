@@ -4,7 +4,7 @@
 
 import { createServer } from "node:http";
 import { load } from "cheerio";
-import { checkTitle } from "./checks.js";
+import { checkTitle, checkHeadings, checkDescription } from "./checks.js";
 
 
 
@@ -76,17 +76,26 @@ const server = createServer(
             });
         }
         
-        const $ = load(html); // `page` is already used above. this is just convention.
-        const title = checkTitle($); // our imported function
-
+        
         // arguments are all good! go ahead and send. \\
+
+        const $ = load(html); // `page` is already used above. this is just convention.
+        
+        const checks = {
+            title: checkTitle($),
+            headings: checkHeadings($),
+            description: checkDescription($),
+        };
+
+        const problems = Object.values(checks).flatMap(check => check.problems);
 
         send(response, 200, { // 200 is OK :)
             url: targetUrl.href, // just the string version of the URL instead of the URL object.
             targetStatus: page.status, // send the same status that the fetched target page gave us.
             contentType: page.headers.get("content-type"),
-            title, // equivalent to `title: title,`
             bytes: html.length, // might not be correct if the page has non-ASCII· characters.
+            problems,
+            checks,
         });
     }
 );
