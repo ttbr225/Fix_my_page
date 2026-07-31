@@ -7,6 +7,7 @@ import { load } from "cheerio";
 import { checkTitle, checkHeadings, checkDescription } from "./checks.js";
 import { fetchPublic } from "./safety.js";
 import { serveStatic } from "./static.js";
+import { writeReport } from "./report.js";
 
 
 
@@ -114,13 +115,20 @@ const server = createServer(
 
         const problems = Object.values(checks).flatMap(check => check.problems);
 
-        send(response, 200, { // 200 is OK :)
+        const auditResult = {
             url: targetUrl.href, // just the string version of the URL instead of the URL object.
             targetStatus: page.status, // send the same status that the fetched target page gave us.
             contentType: page.headers.get("content-type"),
             bytes: html.length, // might not be correct if the page has non-ASCII· characters.
             problems,
             checks,
+        };
+
+        const report = await writeReport(auditResult);
+
+        send(response, 200, { // 200 is OK :)
+            ...auditResult,
+            report,
         });
     }
 );

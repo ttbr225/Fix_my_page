@@ -66,16 +66,25 @@ export default function App() {
  
       {status === "done" && (
         <section>
-          <p>
-            {result.problems.length} problem(s) on {result.url} {/* get rid of the ugly (s) with a conditional */}
-          </p>
-          <ul>
-            {result.problems.map((problem, index) => (
-              <li key={index}>{problem.type}</li>
-            ))}
-          </ul>
+          {result.report ? (
+            result.report.text.split("\n\n").map((p, i) => <p key={i}>{p}</p>)
+          ) : result.problems.length === 0 ? (
+            <p>Nothing significant found on {result.url}.</p>
+          ) : (
+            <p>Found {result.problems.length} issue{result.problems.length === 1 ? "" : "s"}, but couldn't write the report just now — details below.</p>
+          )}
+          <details>
+            <summary>
+              {result.problems.length} finding{result.problems.length === 1 ? "" : "s"}
+            </summary>
+            <ul>
+              {result.problems.map((problem, index) => (
+                <li key={index}>{problem.type}</li>
+              ))}
+            </ul>
+          </details>
         </section>
       )}
     </main>
   );
-}
+};

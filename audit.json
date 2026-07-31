@@ -1,3 +1,48 @@
 {
-  "error": "missing ?url="
+  "url": "https://example.com/",
+  "targetStatus": 200,
+  "contentType": "text/html",
+  "bytes": 559,
+  "problems": [
+    {
+      "type": "no-description"
+    }
+  ],
+  "checks": {
+    "title": {
+      "facts": {
+        "titleExists": true,
+        "titleText": "Example Domain",
+        "titleLength": 14
+      },
+      "problems": []
+    },
+    "headings": {
+      "facts": {
+        "headings": [
+          {
+            "level": 1,
+            "text": "Example Domain"
+          }
+        ],
+        "h1Count": 1
+      },
+      "problems": []
+    },
+    "description": {
+      "facts": {
+        "descriptionCount": 0,
+        "firstDescriptionText": null
+      },
+      "problems": [
+        {
+          "type": "no-description"
+        }
+      ]
+    }
+  },
+  "report": {
+    "text": "Add a concise and relevant meta description to the Example Domain page to improve its SEO and user understanding in search results.",
+    "chute": "single-sentence"
+  }
 }

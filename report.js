@@ -4,45 +4,60 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
 
-const prompt = `
-    
-`
-
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const apiKey = process.env.GEMINI_API_KEY;
+const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 const reportSchema = {
   type: Type.OBJECT,
   properties: {
-    fixThisWeek: {
-      type: Type.ARRAY,
-      maxItems: "3",
-      items: { type: Type.STRING },
-    },
-    worthDoing: {
-      type: Type.ARRAY,
-      maxItems: "4",
-      items: { type: Type.STRING },
-    },
-    housekeeping: { type: Type.STRING, nullable: true },
-    headline: { type: Type.STRING },
+    text: { type: Type.STRING },
+    chute: { type: Type.STRING, enum: ["single-sentence", "short-list", "full-report"] },
   },
-  propertyOrdering: ["fixThisWeek", "worthDoing", "housekeeping", "headline"],
-  required: ["fixThisWeek", "worthDoing", "headline"],
+  propertyOrdering: ["text", "chute"],
+    required: ["text", "chute"],
 };
 
-const response = await ai.models.generateContent({
-  model: "gemini-3.5-flash",
-  contents: prompt,
-  config: {
-    responseMimeType: "application/json",
-    responseSchema: reportSchema,
-  },
-});
 
-let report;
-try {
-  report = JSON.parse(response.text);
-} catch {
-  throw new Error("model returned unparseable JSON");
-}
+
+/**
+ * @typedef {object} AuditResult
+ * @property {string} url
+ * @property {number} bytes
+ * @property {{type: string}[]} problems
+ * @property {object} checks
+*/
+
+/** @param {AuditResult} auditResult */
+export async function writeReport(auditResult) {
+  if (!ai) return null;
+
+  const prompt = `
+  Recommend a course of action and specify which of the chutes best describes the format of your recommendation.
+
+  ${auditResult.url} - ${auditResult.bytes} bytes
+  ${JSON.stringify(auditResult.problems)}
+  ${JSON.stringify(auditResult.checks)}
+  `
+  console.log(prompt);
+
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: reportSchema,
+      },
+    });
+    try {
+      const report = JSON.parse(response.text);
+      console.log(report.chute);
+      return report;
+    } catch {
+      throw new Error(`model returned unparseable JSON: ${response}`);
+    }
+  } catch {
+    return null;
+  };
+
+};
