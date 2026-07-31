@@ -13,6 +13,7 @@ import { serveStatic } from "./static.js";
 const PORT = process.env.PORT ?? 3000;
 
 
+
 /**
  * @param {import("node:http").ServerResponse} response 
  * @param {number} status 
