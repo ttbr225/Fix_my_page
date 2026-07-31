@@ -6,13 +6,18 @@ import { createServer } from "node:http";
 import { load } from "cheerio";
 import { checkTitle, checkHeadings, checkDescription } from "./checks.js";
 import { fetchPublic } from "./safety.js";
+import { serveStatic } from "./static.js";
 
 
 
-const PORT = 3000;
+const PORT = process.env.PORT ?? 3000;
 
 
-
+/**
+ * @param {import("node:http").ServerResponse} response 
+ * @param {number} status 
+ * @param {unknown} body 
+ */
 function send(response, status, body) {
     // `writeHead` before `end`; header before body, or else Node throws. \\
     response.writeHead(status, {
@@ -33,10 +38,8 @@ const server = createServer(
             `http://${request.headers.host}` // basically Python fstrings.
         );
         if (requestUrl.pathname !== "/audit") { 
-            return send(response, 404, {
-                error: "try /audit?url=..."
-            });
-        }
+            return serveStatic(response, requestUrl.pathname);
+        };
 
         const rawUrl = requestUrl.searchParams.get("url"); // this looks through the '?'s in the URL for "url=".
         if (!rawUrl) return send(response, 400, { // "bad request". like `ValueError` in Python.

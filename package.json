@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch server.js",
-    "audit": "curl -s \"http://localhost:3000/audit?url=$npm_config_url\" > audit.json"
+    "audit": "curl -s \"http://localhost:3000/audit?url=$npm_config_url\" > audit.json",
+    "build": "npm install --prefix client && npm run build --prefix client",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",

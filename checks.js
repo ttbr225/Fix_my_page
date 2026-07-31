@@ -1,7 +1,7 @@
 // checks.js
 
 
-
+/** @param {import("cheerio").CheerioAPI} $ */
 export function checkTitle($) {
     const titleTag = $("head > title").first();
     const titleText = titleTag.text().trim();
@@ -30,6 +30,7 @@ export function checkTitle($) {
 
 
 
+/** @param {import("cheerio").CheerioAPI} $ */
 export function checkHeadings($) {
     const headings = $("h1, h2, h3, h4, h5, h6")
         .toArray()
@@ -97,6 +98,7 @@ export function checkHeadings($) {
 
 
 
+/** @param {import("cheerio").CheerioAPI} $ */
 export function checkDescription($) {
     const descriptionTags = $(
         'meta[name="description"]'
