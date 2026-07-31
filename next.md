@@ -44,3 +44,4 @@
 - [/] other checks
 - [ ] `// @ts-check`
 - [ ] multi-page audit
+- [ ] thwart DNS rebinding

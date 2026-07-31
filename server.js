@@ -5,6 +5,7 @@
 import { createServer } from "node:http";
 import { load } from "cheerio";
 import { checkTitle, checkHeadings, checkDescription } from "./checks.js";
+import { fetchPublic } from "./safety.js";
 
 
 
@@ -60,21 +61,18 @@ const server = createServer(
 
         let page, html; // not a tuple; just two declarations.
         try {
-            page = await fetch(targetUrl, { // i'm gonna have to look up the difference between await and async, too.
-                headers: {
-                    "user-agent": "fix-my-page/0.1 (site auditor)"
-                },
-                signal: AbortSignal.timeout(10_000), // in milliseconds.
+            const result = await fetchPublic(targetUrl, {
+                headers: { "user-agent": "fix-my-page/0.1 (site auditor)" },
+                signal: AbortSignal.timeout(10_000), // milliseconds
             });
-            html = await page.text(); // gets and decodes the body stream when it's completed. can only be consumed once!
+            page = result.response;
+            html = await page.text(); // waits for the body stream to end or timeout
         } catch (caughtError) {
             return send(response, 502, {
                 error: "could not reach page",
-                detail: caughtError instanceof Error
-                ? caughtError.message
-                : String(caughtError),
+                detail: caughtError instanceof Error ? caughtError.message : String(caughtError),
             });
-        }
+        };
         
         
         // arguments are all good! go ahead and send. \\
