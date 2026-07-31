@@ -42,7 +42,7 @@ export default function App() {
   return (
     <main>
       <h1>Fix My Page</h1>
-
+      <p>Demo project; not a maintained service.</p>
 
       <form onSubmit={runAudit}>
         <input

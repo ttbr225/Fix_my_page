@@ -13,6 +13,17 @@ import { serveStatic } from "./static.js";
 const PORT = process.env.PORT ?? 3000;
 
 
+const auditHistory = new Map();
+function withinRateLimit(clientKey, max = 10, windowMs = 60 * 60 * 1000) {
+    const now = Date.now();
+    const recent = (auditHistory.get(clientKey) ?? []).filter(t => now - t < windowMs);
+    if (recent.length >= max) return false;
+    recent.push(now);
+    auditHistory.set(clientKey, recent);
+    return true;
+}
+
+
 
 /**
  * @param {import("node:http").ServerResponse} response 
@@ -24,6 +35,7 @@ function send(response, status, body) {
     response.writeHead(status, {
         "content-type": "application/json", // key is quoted due to the hyphen
         "cache-control": "no-store",
+        "x-robots-tag": "noindex, nofollow",
     });
     response.end(JSON.stringify(body, null, 2)); // `null` means we don't want to control what fields of the first argument get serialized. `2` is indentation. `JSON.stringify(body)` would work just as well but would be less pretty.
 }
@@ -39,8 +51,17 @@ const server = createServer(
             `http://${request.headers.host}` // basically Python fstrings.
         );
         if (requestUrl.pathname !== "/audit") { 
+            if (requestUrl.pathname === "/healthz") { // for my cron job to keep the page spun up
+                response.writeHead(200, { "content-type": "text/plain" });
+                return response.end("ok");
+            };
             return serveStatic(response, requestUrl.pathname);
         };
+        const forwarded = (request.headers["x-forwarded-for"] ?? "").split(",");
+        const clientKey = forwarded.at(-1)?.trim() || request.socket.remoteAddress || "unknown";
+        if (!withinRateLimit(clientKey)) {
+            return send(response, 429, { error: "rate limit; try again later"});
+        }
 
         const rawUrl = requestUrl.searchParams.get("url"); // this looks through the '?'s in the URL for "url=".
         if (!rawUrl) return send(response, 400, { // "bad request". like `ValueError` in Python.
@@ -62,6 +83,8 @@ const server = createServer(
                 got: targetUrl.protocol,
             });
         }
+
+        console.log(new Date().toISOString(), "audit", targetUrl.href);
 
         let page, html; // not a tuple; just two declarations.
         try {

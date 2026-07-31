@@ -26,7 +26,9 @@ const MIME_TYPES = {
  * @param {import("node:http").ServerResponse} response 
  * @param {string} pathname 
  */
-export async function serveStatic(response, pathname) { // could i get a type hint for this so that i can understand `response`'s methods, please?
+export async function serveStatic(response, pathname) {
+    response.setHeader("x-robots-tag", "noindex, nofollow");
+
     let decoded;
     try { decoded = decodeURIComponent(pathname); }
     catch { decoded = pathname; }
