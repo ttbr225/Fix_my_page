@@ -2,7 +2,8 @@
 - [x] figure out what to .gitignore and what to stage
 - [x] title, heading, description checks
 - [x] mvp·
-- [ ] README
+- [x] README
+- [ ] take a better screenshot
 - [/] other checks
 - [ ] page purpose
 - [ ] `// @ts-check`
