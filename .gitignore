@@ -2,3 +2,5 @@ node_modules
 dist
 audit.json
 .env
+.direnv
+.vscode
