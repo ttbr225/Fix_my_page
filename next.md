@@ -4,6 +4,7 @@
 - [x] mvp·
 - [ ] README
 - [/] other checks
+- [ ] page purpose
 - [ ] `// @ts-check`
 - [ ] thwart DNS rebinding
 - [ ] multi-page audit

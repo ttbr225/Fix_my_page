@@ -60,7 +60,8 @@ const server = createServer(
         };
         const forwarded = (request.headers["x-forwarded-for"] ?? "").split(",");
         const clientKey = forwarded.at(-1)?.trim() || request.socket.remoteAddress || "unknown";
-        if (!withinRateLimit(clientKey)) {
+        const isLocal = clientKey === "127.0.0.1" || clientKey === "::1";
+        if (!isLocal && !withinRateLimit(clientKey)) {
             return send(response, 429, { error: "rate limit; try again later"});
         }
 

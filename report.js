@@ -29,7 +29,8 @@ const reportSchema = {
 
 /** @param {AuditResult} auditResult */
 export async function writeReport(auditResult) {
-  if (!ai) return null;
+  if (!ai) { console.warn("no API key"); return null; };
+  if (auditResult.problems.length === 0) { console.log("report: nothing to report"); return null; }
 
   const prompt = `
   Recommend a course of action and specify which of the chutes best describes the format of your recommendation.
@@ -38,7 +39,6 @@ export async function writeReport(auditResult) {
   ${JSON.stringify(auditResult.problems)}
   ${JSON.stringify(auditResult.checks)}
   `
-  console.log(prompt);
 
   try {
     const response = await ai.models.generateContent({
@@ -51,13 +51,12 @@ export async function writeReport(auditResult) {
     });
     try {
       const report = JSON.parse(response.text);
-      console.log(report.chute);
       return report;
     } catch {
       throw new Error(`model returned unparseable JSON: ${response}`);
     }
-  } catch {
+  } catch (caughtError) {
+    console.error("call failed:", caughtError instanceof Error ? caughtError.message : String(caughtError));
     return null;
   };
-
 };

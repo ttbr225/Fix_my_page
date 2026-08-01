@@ -71,7 +71,7 @@ export default function App() {
           ) : result.problems.length === 0 ? (
             <p>Nothing significant found on {result.url}.</p>
           ) : (
-            <p>Found {result.problems.length} issue{result.problems.length === 1 ? "" : "s"}, but couldn't write the report just now — details below.</p>
+            <p>Found {result.problems.length} issue{result.problems.length === 1 ? "" : "s"}, but couldn't write the report just now. Details below.</p>
           )}
           <details>
             <summary>
